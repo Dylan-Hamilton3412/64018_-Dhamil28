@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+## Library the lpSolveAPI
+library(lpSolveAPI)
+
+## Initially create an lp file. Leaving code in file for reference
+## write.lp(lp.model, "Assignment2.lp", type = "lp")
+
+##Read the lp file containing the model parameters
+Lp.Model <- read.lp("Assignment2.lp")
+
+## Describe the lp model
+Lp.Model
+
+## Solve the lp model
+solve(Lp.Model)
+
+## get the object formula amount
+## This case is maximizing profit
+Profit <- get.objective(Lp.Model)
+## Profit projected to be $694,620
+
+## Get the variable amounts
+LP.Vars <- get.variables(Lp.Model)
+
+## Find the constraint values
+LP.Cons <- get.constraints(Lp.Model)
+```
+After running the lp model the max profit the model calculated is $694,620.00 with a 92 percent capacity percent from each of the 3 plants. The specs relating to the exact production are below.
+
+```{r}
+## Create production table
+production_table <- data.frame(
+  Product = c("Large", "Medium", "Small", "Total"),
+  Plant_1 = c(LP.Vars[1], LP.Vars[4], LP.Vars[7],
+              LP.Vars[1] + LP.Vars[4] + LP.Vars[7]),
+  
+  Plant_2 = c(LP.Vars[2], LP.Vars[5], LP.Vars[8],
+              LP.Vars[2] + LP.Vars[5] + LP.Vars[8]),
+  
+  Plant_3 = c(LP.Vars[3], LP.Vars[6], LP.Vars[9],
+              LP.Vars[3] + LP.Vars[6] + LP.Vars[9]),
+  
+  Total = c(
+    LP.Vars[1] + LP.Vars[2] + LP.Vars[3],
+    LP.Vars[4] + LP.Vars[5] + LP.Vars[6],
+    LP.Vars[7] + LP.Vars[8] + LP.Vars[9],
+    sum(LP.Vars[1:9])),
+  
+  Profit_per_unit = c(420, 360, 300, NA),
+  
+  Profit = c(532 * 420, 853 * 360, 547 * 300, 694620)
+)
+
+
+production_table
+```
+
+

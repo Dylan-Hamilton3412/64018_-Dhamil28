@@ -1,0 +1,43 @@
+---
+title: "Hamilton Assignment 3"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r}
+## Library the Lp solving package lpSolveAPI
+library("lpSolveAPI")
+
+##Create the LP file for this assignment
+##lp.model <- make.lp()
+##write.lp(lp.model, "Assignment3.lp", type = "lp")
+
+##Read the lp model created for this assignment
+Model <- read.lp("Assignment3.lp")
+```
+
+In the lp file I combined the prduction cost and the shipping cost into one combined total cost variable. For example Plant A to warehouse 1 has a production cost of $600 and a shipping cost of $22 making a total variable cost for X11 = $622.
+
+In the lp file you will see that the production constraints are using a <= sign rather than a = as typically used in the examples. This is due to the fact that in this LP problem the production capacity (supply) is greater than the Monthly demand. Since we are minimizing cost and the problem does not involve rolling over supplies to the next month we want our supply to not go further than our monthly demand.
+
+```{r}
+## Solve the model using the LP file created
+solve(Model)
+
+## Get the objective formula amount in this problem we are minimizing cost
+Cost <- get.objective(Model)
+Cost
+
+## Get the variable amounts for each of the 6 decision variables created
+Model.Var <- get.variables(Model)
+Model.Var
+
+## Get the constrain values
+Model.Constraints <- get.constraints(Model)
+Model.Constraints
+```
+For this LP model an expected minimum cost of $132,790 is projected based on the values given in the assignment. This comes with a total production of 100 units from plant A and 110 units from plant B. Warehouse 1 has all 80 monthly units coming from Plant B. Warehouse 2 has all 60 units coming from Plant A. Warehouse 3 has a split of having 40 and 30 units coming from Plant A and Plant B respectively.
+
+We can clearly see a trend in determining the production and shipping units based on the shipping cost of the units, with the two lowest shipping cost variables (X12 & X21) making up their entire warehouse demand without splitting the shipments between different plants

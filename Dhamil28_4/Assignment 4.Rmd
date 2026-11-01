@@ -1,0 +1,117 @@
+---
+title: "Hamilton Assignment 4"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+
+```{r}
+##Install and library the required package for this assignment
+## install.packages("Benchmarking")
+library(Benchmarking)
+
+##Since the nursing homes we are evaluating have two inputs and two outputs we need to create 2 matrixes containing the values listed in two seperate columns
+Input <- matrix(c(150,400,320,520,350,320,.2,.7,1.2,2.0,1.2,.7), ncol = 2)
+Output <- matrix(c(14000,14000,42000,28000,19000,14000,3500,21000,10500,42000,25000,15000),ncol = 2)
+
+##Add the column names for interperatation according to the assignment discription
+colnames(Input) <- c("Staff Hours Per Day","Supplies per Day")
+colnames(Output) <- c("Reimbursed Patient-Days", "Privately Paid Patient-Days")
+
+## Combine the two matrixes together for a consolidated view of the data
+Combined_Matrix <- cbind(Input, Output)
+Combined_Matrix
+```
+
+```{r}
+## Run the DEA analysis for the Free Disposal Hull
+FDH_DEA <- dea(Input, Output, RTS ="fdh")
+FDH_DEA
+##Retrive the peers from the model showing the DMU that is most related to the test DMU
+FDH_Peers <- peers(FDH_DEA)
+FDH_Peers
+##Retries the lambdas to show the DMU influence weights
+FDH_Lambda <- lambda(FDH_DEA)
+FDH_Lambda
+```
+Under this assumption all DMUs were their own peer meaning all DMUs were efficent
+```{r}
+## Run the DEA analysis for the Constant Returns to Scale
+CRS_DEA <- dea(Input, Output, RTS ="crs")
+CRS_DEA
+##Retrive the peers from the model showing the DMU that is most related to the test DMU
+CRS_Peers <- peers(CRS_DEA)
+CRS_Peers
+##Retries the lambdas to show the DMU influence weights
+CRS_Lambda <- lambda(CRS_DEA)
+CRS_Lambda
+```
+DMUs 1-4 were listed as efficient with 5 and 6 showing as not efficient. Both DMU 5 and 6 were showing as a peer to 1, 2, and 4. DMU5 had a larger peer weight going towards DMU 4 with a lambda of .538 while 6 was more even across peers 1 and 2 with a weight of .34 and .39 respectively.  DMU 5 had efficiency of .9775 and DMU 6 had .8675. 
+```{r}
+## Run the DEA analysis for the Variable Returns to Scale
+VRS_DEA <- dea(Input, Output, RTS ="vrs")
+VRS_DEA
+##Retrive the peers from the model showing the DMU that is most related to the test DMU
+VRS_Peers <- peers(VRS_DEA)
+VRS_Peers
+##Retries the lambdas to show the DMU influence weights
+VRS_Lambda <- lambda(VRS_DEA)
+VRS_Lambda
+```
+Under the Variable return to scale all the DMUs were listed as efficient except for DMU 6 which had efficieny of .8963 with peers of 1, 2 and 5. The weights of peer 1 and 2 were similar with the results being weights of .40 and .34 respectively.
+```{r}
+## Run the DEA analysis for the Increasing Returns to Scale
+IRS_DEA <- dea(Input, Output, RTS ="irs")
+IRS_DEA
+##Retrive the peers from the model showing the DMU that is most related to the test DMU
+IRS_Peers <- peers(IRS_DEA)
+IRS_Peers
+##Retries the lambdas to show the DMU influence weights
+IRS_Lambda <- lambda(IRS_DEA)
+IRS_Lambda
+```
+Under the increasing return to scale all the DMUs were listed as efficient except for DMU 6 which had efficieny of .8963 with peers of 1, 2 and 5. The weights of peer 1 and 2 were similar with the results being weights of .40 and .34 respectively.
+```{r}
+## Run the DEA analysis for the Decreasing Returns to Scale
+DRS_DEA <- dea(Input, Output, RTS ="drs")
+DRS_DEA
+##Retrive the peers from the model showing the DMU that is most related to the test DMU
+DRS_Peers <- peers(DRS_DEA)
+DRS_Peers
+##Retries the lambdas to show the DMU influence weights
+DRS_Lambda <- lambda(DRS_DEA)
+DRS_Lambda
+```
+DMUs 1-4 were listed as efficient with 5 and 6 showing as not efficient. Both DMU 5 and 6 were showing as a peer to 1, 2, and 4. DMU5 had a larger peer weight going towards DMU 4 with a lambda of .538 while 6 was more even across peers 1 and 2 with a weight of .34 and .39 respectively.  DMU 5 had efficiency of .9775 and DMU 6 had .8675.
+```{r}
+## Run the DEA analysis for the Free Replicability and Disposability Hull
+## Under the package details it states that the RTS argument method for the free disposability and replicability hull is "add"
+FRH_DEA <- dea(Input, Output, RTS ="add")
+FRH_DEA
+##Retrive the peers from the model showing the DMU that is most related to the test DMU
+FRH_Peers <- peers(FRH_DEA)
+FRH_Peers
+##Retries the lambdas to show the DMU influence weights
+FRH_Lambda <- lambda(FRH_DEA)
+FRH_Lambda
+```
+Under the Free Replicability and Disposability Hull all DMUs are showing listed as efficient.
+```{r}
+## Take the efficiencies listed from each of the models above and consolidate them into a singluar table
+DEA_Efficiency <- data.frame(
+  DMU = 1:6,
+  FDH = FDH_DEA$eff,
+  CRS = CRS_DEA$eff,
+  VRS = VRS_DEA$eff,
+  IRS = IRS_DEA$eff,
+  DRS = DRS_DEA$eff,
+  FRH = FRH_DEA$eff
+)
+DEA_Efficiency
+```
+Through the efficiency table we can see that DMUs 1-4 are as efficient as possible with their respective inputs in outputs however the final two remaining DMUs have some improvements to make. DMU 5 appears to have a very slight deviation with only two of the models showing a .977 efficiency so even though some improvements may need to be made to increase overall output it is close to performing at peak efficiency. DMU 6 has the most room for improvement with its efficiency rating in 4 of the 6 models reaching down in the .89 - .86 range. There could be some drastic improvements made in order to increase the overall efficiency in relation the paid patient days to the supplies and labor hours used. 
+For both DMU 5 and 6 they share in common two of their peers. Both share common peers of DMU 1 and 2 this means that you could closely look into what facility 1 and 2 are doing differently than 5 and 6 to potentially increase the overall efficiency of these two facilities. They should aim to model their own processes to match those of facilities 1 and 2 with DMU 5 also taking into account the processes of DMU4 due to the peer weights being greater than those of 1 and 2.
+
+

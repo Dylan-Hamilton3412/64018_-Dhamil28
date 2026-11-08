@@ -1,0 +1,40 @@
+---
+title: "Hamilton Assignment 5"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library("lpSolveAPI")
+
+##Create the lp model. Leaving code in for record purposes
+## lp <- make.lp()
+## write.lp(lp,"Goal_Programming.lp")
+
+##Read the lp model that was created
+lp <- read.lp("Goal_Programming.lp")
+
+##Solve the lp model
+solve(lp)
+
+## Get the weighted objective score 
+##Important to note that even though the objective score includes profit in the calculation this is not
+## a representation of profit in a dollar amount
+get.objective(lp)
+
+## Get the individual variables amounts that were used to get the objective score
+get.variables(lp)
+```
+1. The y1p and y1n variables were assigned to show the penalty weight assigned to the deviation above and below from the goal amount of employment. In our assignment these variables were assigned a weight of 6 for movement in either direction
+
+2. The y2p and y2n were assigned to shown the penalty weight assigned to the deviation of next year earnings from the goal. However the differentiating characteristic of this goal comparatively to the employment level is that this was a lower one-sided goal. This means that a penalty weight was assigned only to the variable if it was under the goal of 75. This is also why within the objective formula that you only see mention of the y2n variable with a weight assigned of 3 for every amount under the goal specified. Any amount over the goal of 75 was not penalized
+
+Results: After solving the lp package we show an objective score of 225. Remember as stated in the above code the 225 is not represented as the total dollar amount profit the business is accruing but is the basic objective score that the objective function seeks to maximize.
+
+We ended with variables showing that the unit contribution all came from Product 3 with 15 products being manufactured. Which leads to the below details:
+Total Profit: 375 Million |
+Employment level: 7500 employes - 2500 over the goal |
+Earnings next year: 75 Million |
+
+From the above information you can see that only the employment level went over its allowed goal which can also be shown in the lp variables as well. You can see that the variables assigned to y1p which is the penatly variable assigned to the employment level above the goal was listed as being 25. Which if taken back to the table in the assignment would equivilate to the 2500 additional employees shown in the final statistics.
